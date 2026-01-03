@@ -1,4 +1,4 @@
-import 'package:ayurvediccenter/Application/Presentation/LoginScreen/loginscreen.dart';
+import 'package:ayurvediccenter/Application/screens/LoginScreen/loginscreen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -1,14 +1,36 @@
-import 'package:ayurvediccenter/Application/Presentation/RegisterPatient/registerpatient.dart';
-import 'package:flutter/material.dart';
+import 'package:ayurvediccenter/Application/screens/RegisterPatient/registerpatient.dart';
+import 'package:ayurvediccenter/Data/providers/auth_provider.dart';
+import 'package:ayurvediccenter/Data/providers/patient_provider.dart';
 
-class PatientListScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class PatientListScreen extends StatefulWidget {
   const PatientListScreen({super.key});
+
+  @override
+  State<PatientListScreen> createState() => _PatientListScreenState();
+}
+
+class _PatientListScreenState extends State<PatientListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final token = Provider.of<AuthProvider>(context, listen: false).token;
+      if (token != null) {
+        Provider.of<PatientProvider>(
+          context,
+          listen: false,
+        ).fetchPatients(token);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: SizedBox(
@@ -39,7 +61,6 @@ class PatientListScreen extends StatelessWidget {
           ),
         ),
       ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -69,7 +90,6 @@ class PatientListScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -108,7 +128,6 @@ class PatientListScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(
@@ -141,70 +160,105 @@ class PatientListScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF2F2F2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${index + 1}. Vikram Singh",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+              child: Consumer<PatientProvider>(
+                builder: (context, patientProvider, child) {
+                  if (patientProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (patientProvider.errorMessage != null) {
+                    return Center(
+                      child: Text(
+                        patientProvider.errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
+
+                  if (patientProvider.patients.isEmpty) {
+                    return const Center(child: Text("No patients found"));
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: patientProvider.patients.length,
+                    itemBuilder: (context, index) {
+                      final patient = patientProvider.patients[index];
+                      // Format data safely
+                      final name = patient.name ?? "Unknown";
+                      final treatments =
+                          patient.patientdetailsSet
+                              ?.map((e) => e.treatmentName)
+                              .join(", ") ??
+                          "No treatments";
+                      final date = patient.dateNdTime?.split("T")[0] ?? "N/A";
+                      final user = patient.user ?? "Unknown";
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF2F2F2),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Couple Combo Package (Rejuven...)",
-                          style: TextStyle(
-                            color: Color(0xFF0B6E3F),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: const [
-                            Icon(
-                              Icons.calendar_month,
-                              size: 16,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 4),
-                            Text("31/01/2024"),
-                            SizedBox(width: 12),
-                            Icon(Icons.group, size: 16, color: Colors.red),
-                            SizedBox(width: 4),
-                            Text("Jithesh"),
-                          ],
-                        ),
-                        const Divider(height: 20),
-                        Row(
-                          children: const [
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              "View Booking details",
-                              style: TextStyle(fontWeight: FontWeight.w500),
+                              "${index + 1}. $name",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
                             ),
-                            Spacer(),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 16,
-                              color: Color(0xFF0B6E3F),
+                            const SizedBox(height: 4),
+                            Text(
+                              treatments,
+                              style: const TextStyle(
+                                color: Color(0xFF0B6E3F),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_month,
+                                  size: 16,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(date),
+                                const SizedBox(width: 12),
+                                const Icon(
+                                  Icons.group,
+                                  size: 16,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(user),
+                              ],
+                            ),
+                            const Divider(height: 20),
+                            Row(
+                              children: const [
+                                Text(
+                                  "View Booking details",
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: Color(0xFF0B6E3F),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

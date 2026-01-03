@@ -1,16 +1,64 @@
 import 'dart:ui';
-import 'package:ayurvediccenter/Application/Presentation/PatientListScreen/patientlist.dart';
-import 'package:ayurvediccenter/Domain/Common/widgets/app_text_style.dart';
-import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
+import 'package:ayurvediccenter/Application/screens/PatientListScreen/patientlist.dart';
+import 'package:ayurvediccenter/Data/providers/auth_provider.dart';
+import 'package:ayurvediccenter/Domain/Common/widgets/app_text_style.dart';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final username = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter username and password")),
+      );
+      return;
+    }
+
+    final success = await authProvider.login(username, password);
+
+    if (success) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const PatientListScreen()),
+      );
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authProvider.errorMessage ?? "Login failed")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -65,6 +113,7 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(height: height * 0.01),
 
                   TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       hintText: "Enter your email",
                       border: OutlineInputBorder(
@@ -87,6 +136,7 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(height: height * 0.01),
 
                   TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: "Enter password",
@@ -112,20 +162,18 @@ class LoginScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const PatientListScreen(),
-                          ),
-                        );
-                      },
-                      child: AppText(
-                        text: "Login",
-                        fontSize: width * 0.045,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      onPressed: authProvider.isLoading ? null : _handleLogin,
+                      child:
+                          authProvider.isLoading
+                              ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                              : AppText(
+                                text: "Login",
+                                fontSize: width * 0.045,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                     ),
                   ),
 
