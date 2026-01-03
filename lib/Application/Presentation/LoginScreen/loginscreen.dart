@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:ayurvediccenter/Application/Presentation/PatientListScreen/patientlist.dart';
 import 'package:ayurvediccenter/Domain/Common/widgets/app_text_style.dart';
 import 'package:flutter/material.dart';
 
@@ -111,7 +112,14 @@ class LoginScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PatientListScreen(),
+                          ),
+                        );
+                      },
                       child: AppText(
                         text: "Login",
                         fontSize: width * 0.045,
