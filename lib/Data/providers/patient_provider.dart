@@ -19,7 +19,9 @@ class PatientProvider with ChangeNotifier {
   List<Treatment> get treatments => _treatments;
 
   Future<void> fetchPatients(String token) async {
-    _isLoading = true;
+    if (_patients.isEmpty) {
+      _isLoading = true;
+    }
     _errorMessage = null;
     notifyListeners();
 

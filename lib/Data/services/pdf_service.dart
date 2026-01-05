@@ -13,12 +13,12 @@ class PdfService {
   }) async {
     final pdf = pw.Document();
 
-    // Load Fonts
+   
     final font = await PdfGoogleFonts.poppinsRegular();
     final fontBold = await PdfGoogleFonts.poppinsBold();
     final fontMedium = await PdfGoogleFonts.poppinsMedium();
 
-    // Load Images
+   
     final logoImage = await imageFromAssetBundle('assets/images/Group.png');
     final watermarkImage = await imageFromAssetBundle(
       'assets/images/Layer_1-2.png',
@@ -34,7 +34,7 @@ class PdfService {
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              // Watermark
+              
               pw.Center(
                 child: pw.Opacity(
                   opacity: 0.1,
@@ -42,11 +42,11 @@ class PdfService {
                 ),
               ),
 
-              // Content
+             
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  // Header
+                
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -95,7 +95,7 @@ class PdfService {
                   pw.Divider(color: PdfColors.grey300),
                   pw.SizedBox(height: 10),
 
-                  // Patient Details
+                  
                   pw.Text(
                     "Patient Details",
                     style: pw.TextStyle(
@@ -138,7 +138,7 @@ class PdfService {
 
                   pw.SizedBox(height: 20),
 
-                  // Treatment Table Header
+                  
                   pw.Container(
                     padding: const pw.EdgeInsets.symmetric(vertical: 8),
                     child: pw.Row(
@@ -201,7 +201,6 @@ class PdfService {
                   ),
                   pw.Divider(color: PdfColors.grey300),
 
-                  // Treatment Rows
                   ...selectedTreatments.map((item) {
                     final price =
                         double.tryParse(item.treatment.price ?? "") ?? 0;
@@ -289,29 +288,23 @@ class PdfService {
 
                   pw.Spacer(),
 
-                  // Footer
+                 
                   pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
                     children: [
-                      pw.Text(
-                        "Thank you for choosing us",
-                        style: pw.TextStyle(
-                          font: fontBold,
-                          color: PdfColors.green800,
-                          fontSize: 14,
-                        ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text("Thank you for choosing us", style: pw.TextStyle(font: fontBold, color: PdfColors.green800, fontSize: 14)),
+                          pw.SizedBox(height: 5),
+                          pw.Text("Your well-being is our commitment, and we're honored\nyou've entrusted us with your health journey", 
+                            textAlign: pw.TextAlign.right,
+                            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600)
+                          ),
+                          pw.SizedBox(height: 10),
+                          pw.Image(signatureImage, width: 60),
+                        ]
                       ),
-                      pw.SizedBox(height: 5),
-                      pw.Text(
-                        "Your well-being is our commitment, and we're honored\nyou've entrusted us with your health journey",
-                        textAlign: pw.TextAlign.right,
-                        style: const pw.TextStyle(
-                          fontSize: 9,
-                          color: PdfColors.grey600,
-                        ),
-                      ),
-                      pw.SizedBox(height: 10),
-                      pw.Image(signatureImage, width: 60),
                     ],
                   ),
 

@@ -35,7 +35,12 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           Container(color: Colors.black.withOpacity(0.4)),
 
-          Center(child: Image.asset('assets/images/Layer_1-2.png', width: 140)),
+          Center(
+            child: Image.asset(
+              'assets/images/Layer_1-2.png',
+              width: MediaQuery.of(context).size.width * 0.4,
+            ),
+          ),
         ],
       ),
     );

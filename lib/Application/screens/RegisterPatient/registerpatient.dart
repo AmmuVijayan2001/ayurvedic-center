@@ -3,6 +3,7 @@ import 'package:ayurvediccenter/Data/models/selected_treatment.dart';
 import 'package:ayurvediccenter/Data/providers/auth_provider.dart';
 import 'package:ayurvediccenter/Data/providers/patient_provider.dart';
 import 'package:ayurvediccenter/Data/services/pdf_service.dart';
+import 'package:ayurvediccenter/Application/screens/PatientListScreen/patientlist.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -93,10 +94,20 @@ class _RegisterPatientScreenState extends State<RegisterPatientScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.arrow_back),
-                      Spacer(),
-                      Icon(Icons.notifications_none),
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PatientListScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.notifications_none),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -573,6 +584,11 @@ class _RegisterPatientScreenState extends State<RegisterPatientScreen> {
         bookedOn: DateTime.now(),
       );
        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("PDF Generated!")));
+       
+       // Navigate to Home
+       Navigator.of(context).pushReplacement(
+         MaterialPageRoute(builder: (context) => const PatientListScreen()),
+       );
 
     } catch (e) {
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
