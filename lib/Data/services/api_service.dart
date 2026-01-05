@@ -50,4 +50,79 @@ class ApiService {
       throw Exception('Failed to load patient list: $e');
     }
   }
+
+  Future<BranchListResponse> getBranchList(String token) async {
+    final url = Uri.parse('$baseUrl/BranchList');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('BranchList Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return BranchListResponse.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to load branch list: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load branch list: $e');
+    }
+  }
+
+  Future<TreatmentListResponse> getTreatmentList(String token) async {
+    final url = Uri.parse('$baseUrl/TreatmentList');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('TreatmentList Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return TreatmentListResponse.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to load treatment list: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load treatment list: $e');
+    }
+  }
+
+  Future<void> registerPatient(String token, Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/PatientUpdate');
+    try {
+      // Use FormData to send fields
+      final request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $token';
+
+      data.forEach((key, value) {
+        request.fields[key] = value.toString();
+      });
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      print('Register Response: $responseBody');
+
+      if (response.statusCode == 200) {
+        // Success
+        final decoded = json.decode(responseBody);
+        if (decoded['status'] == true) {
+          return;
+        } else {
+          throw Exception(decoded['message'] ?? 'Registration failed');
+        }
+      } else {
+        throw Exception('Failed to register: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to register: $e');
+    }
+  }
 }

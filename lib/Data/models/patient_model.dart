@@ -158,6 +158,119 @@ class PatientDetails {
   }
 }
 
+class BranchListResponse {
+  bool? status;
+  String? message;
+  List<Branch>? branches;
+
+  BranchListResponse({this.status, this.message, this.branches});
+
+  BranchListResponse.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    message = json['message'];
+    if (json['branches'] != null) {
+      branches = <Branch>[];
+      json['branches'].forEach((v) {
+        if (v != null)
+        branches!.add(Branch.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['message'] = message;
+    if (branches != null) {
+      data['branches'] = branches!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class TreatmentListResponse {
+  bool? status;
+  String? message;
+  List<Treatment>? treatments;
+
+  TreatmentListResponse({this.status, this.message, this.treatments});
+
+  TreatmentListResponse.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    message = json['message'];
+    if (json['treatments'] != null) {
+      treatments = <Treatment>[];
+      json['treatments'].forEach((v) {
+        if (v != null)
+        treatments!.add(Treatment.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['message'] = message;
+    if (treatments != null) {
+      data['treatments'] = treatments!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Treatment {
+  int? id;
+  List<Branch>? branches;
+  String? name;
+  String? duration;
+  String? price;
+  bool? isActive;
+  String? createdAt;
+  String? updatedAt;
+
+  Treatment(
+      {this.id,
+      this.branches,
+      this.name,
+      this.duration,
+      this.price,
+      this.isActive,
+      this.createdAt,
+      this.updatedAt});
+
+  Treatment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    if (json['branches'] != null) {
+      branches = <Branch>[];
+      json['branches'].forEach((v) {
+        if (v != null)
+        branches!.add(Branch.fromJson(v));
+      });
+    }
+    name = json['name'];
+    duration = json['duration'];
+    price = json['price'];
+    isActive = json['is_active'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (branches != null) {
+      data['branches'] = branches!.map((v) => v.toJson()).toList();
+    }
+    data['name'] = name;
+    data['duration'] = duration;
+    data['price'] = price;
+    data['is_active'] = isActive;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
 class Branch {
   int? id;
   String? name;
